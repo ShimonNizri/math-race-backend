@@ -33,4 +33,15 @@ public class AuthRepository extends BaseRepository {
                 .setParameter("userName", userName)
                 .uniqueResult();
     }
+
+    public int countByUsersBot() {
+        String hql = "SELECT COUNT(u) FROM UserEntity u WHERE u.role = :botRole";
+
+        Long count = getCurrentSession()
+                .createQuery(hql, Long.class)
+                .setParameter("botRole", UserEntity.UserRole.BOT)
+                .uniqueResult();
+
+        return count != null ? count.intValue() : 0;
+    }
 }

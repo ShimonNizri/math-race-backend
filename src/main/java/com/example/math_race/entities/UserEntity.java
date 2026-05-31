@@ -12,6 +12,7 @@ public class UserEntity extends BaseEntity {
     public enum UserRole {
         ADMIN,
         USER,
+        BOT
     }
 
     private String username;

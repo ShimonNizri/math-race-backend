@@ -14,6 +14,8 @@ import com.example.math_race.entities.UserEntity;
 import com.example.math_race.exception.ErrorCode;
 import com.example.math_race.exception.LogicException;
 import com.example.math_race.race.*;
+import com.example.math_race.race.bot_simulation.BotRaceHandler;
+import com.example.math_race.race.bot_simulation.BotSwarmManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
@@ -31,14 +33,16 @@ public class RaceService {
     private final AuthService authService;
     private final WebSocketService webSocketService;
     private final RaceEngineService raceEngineService;
+    private final BotSwarmManager botSwarmManager;
     private final Map<String, RaceManager> allRaces =  new ConcurrentHashMap<>();
     private final Map<String, String> accountIdToOpenRoomCode = new ConcurrentHashMap<>();
 
     @Autowired
-    public RaceService(AuthService authService, WebSocketService webSocketService, RaceEngineService raceEngineService) {
+    public RaceService(BotSwarmManager botSwarmManager, AuthService authService, WebSocketService webSocketService, RaceEngineService raceEngineService) {
         this.authService = authService;
         this.webSocketService = webSocketService;
         this.raceEngineService = raceEngineService;
+        this.botSwarmManager = botSwarmManager;
     }
 
     public CreateRaceResponse creatRace(CreateRaceRequest request, RequestMetadata metadata){
@@ -51,7 +55,6 @@ public class RaceService {
         String nickname = request.getNickname() != null && !request.getNickname().isEmpty() &&
                 request.getNickname().trim().length() >= 3 && request.getNickname().trim().length() <= 20 ?
                 request.getNickname() : user.getUsername();
-
 
         RaceSettings raceSettings = new RaceSettings(request.getName(), request.getTargetScore(),request.isPrivate());
 
@@ -67,7 +70,9 @@ public class RaceService {
         allRaces.put(raceManager.getRoomCode(), raceManager);
 
 
-        fullRace(true,raceManager);
+        if (raceManager.getSettings().getRaceName().equals("test_bot")){
+            botSwarmManager.deployBotsToRoom(raceManager.getRoomCode(),6,6);
+        }
 
         return new CreateRaceResponse(
                 raceSettings.getRaceName(),
@@ -76,15 +81,6 @@ public class RaceService {
                 nickname,
                 joinToken
         );
-    }
-
-    public void fullRace(boolean toDo, RaceManager race){
-        if (toDo){
-            for (int i = 0; i < 18; i++) {
-                race.joinRace(new RacePlayer("stam" + UUID.randomUUID().toString().substring(0, 8), "", "", createNickname()));
-            }
-        }
-
     }
 
     public List<RaceInfoResponse> getActivePublicRaces(PublicRacesListRequest request) {

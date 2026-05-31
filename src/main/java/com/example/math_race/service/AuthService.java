@@ -204,6 +204,17 @@ public class AuthService {
         return new CreateGuestTokenResponse(sessionToken,30);
     }
 
+    @Transactional
+    public TokenEntity generateTokenForBot(int botIndex) {
+        String botUsername = "Bot_" + botIndex;
+        UserEntity botUser = userRepository.findByEmailOrUsername("",botUsername);
+        if (botUser == null) {
+            throw new RuntimeException("Bot user not found in DB");
+        }
+
+        return tokenService.createTokenEntity(botUser, SESSION);
+    }
+
     public String getGuestIdByToken(String token) {
         if (token == null) return null;
         return guestSessions.getIfPresent(token);
