@@ -18,8 +18,8 @@ public class CreateRaceRequest {
     private String name;
 
     @NotNull(message = "Target score is required")
-    @Min(value = 20, message = "Target score must be at least 20")
-    @Max(value = 100000, message = "Target score cannot exceed 100000")
+    @Min(value = 400, message = "Target score must be at least 400")
+    @Max(value = 2500, message = "Target score cannot exceed 2500")
     private Integer targetScore;
 
     @Size(max = 15, message = "nickname cannot exceed 15 characters")
