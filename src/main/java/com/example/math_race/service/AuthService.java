@@ -87,6 +87,10 @@ public class AuthService {
             throw new LogicException(ErrorCode.USERNAME_ALREADY_EXISTS);
         }
 
+        if (request.getUsername().equalsIgnoreCase("bot") || request.getUsername().toLowerCase().startsWith("bot_")) {
+            throw new LogicException(ErrorCode.RESERVED_USERNAME);
+        }
+
         user = new UserEntity(request.getUsername(), hashPassword(request.getPassword()), request.getEmail());
         userRepository.save(user);
 

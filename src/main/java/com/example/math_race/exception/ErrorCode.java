@@ -17,6 +17,7 @@ public enum ErrorCode {
     USERNAME_SAME_AS_OLD(1009, "New username cannot be the same as the current username!"),
     ACCOUNT_DELETED(1010,"Account has been deleted!"),
     INCORRECT_PASSWORD(1011, "Incorrect password!"),
+    RESERVED_USERNAME(1012, "This username is reserved and cannot be used!"),
 
     // Token & Security Errors (1100 Series)
     INVALID_TOKEN(1100, "The token is invalid or has expired."),

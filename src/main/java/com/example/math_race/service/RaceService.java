@@ -70,8 +70,12 @@ public class RaceService {
         allRaces.put(raceManager.getRoomCode(), raceManager);
 
 
-        if (raceManager.getSettings().getRaceName().equals("test_bot")){
-            botSwarmManager.deployBotsToRoom(raceManager.getRoomCode(),6,6);
+        if (user.getRole().equals(UserEntity.UserRole.ADMIN) && raceManager.getSettings().getRaceName().equals("test_bot")){
+            try {
+                botSwarmManager.deployBotsToRoom(raceManager, 6, 6);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
 
         return new CreateRaceResponse(

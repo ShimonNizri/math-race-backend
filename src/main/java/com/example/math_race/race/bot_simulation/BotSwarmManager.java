@@ -3,6 +3,7 @@ package com.example.math_race.race.bot_simulation;
 import com.example.math_race.dto.http.request.JoinRaceRequest;
 import com.example.math_race.dto.http.request.RequestMetadata;
 import com.example.math_race.entities.TokenEntity;
+import com.example.math_race.race.RaceManager;
 import com.example.math_race.race.RacePlayer;
 import com.example.math_race.service.AuthService;
 import com.example.math_race.service.RaceService;
@@ -37,46 +38,53 @@ public class BotSwarmManager {
         this.stompClient.setMessageConverter(new MappingJackson2MessageConverter());
     }
 
-    public void deployBotsToRoom(String roomCode, int guestCount, int registeredCount) {
+    public void deployBotsToRoom(RaceManager race, int guestCount, int registeredCount) {
         for (int i = 0; i < guestCount; i++) {
-            int currentCount = guestCounter.getAndIncrement();
-            String botName = "Bot_" + currentCount;
+            try {
+                int currentCount = guestCounter.getAndIncrement();
+                String botName = "Bot_" + currentCount;
 
-            String guestToken = authService.createGuestToken().getGuestToken();
+                String guestToken = authService.createGuestToken().getGuestToken();
 
-            RequestMetadata metadata = new RequestMetadata();
-            metadata.setGuestToken(guestToken);
+                RequestMetadata metadata = new RequestMetadata();
+                metadata.setGuestToken(guestToken);
 
-            String joinToken = raceService.joinRace(roomCode, new JoinRaceRequest(botName), metadata).getJoinToken();
-            RacePlayer player = (RacePlayer) raceService.findAccountByIdInOpenRace(authService.getGuestIdByToken(guestToken));
+                raceService.joinRace(race.getRoomCode(), new JoinRaceRequest(botName), metadata);
+                RacePlayer player = (RacePlayer) raceService.findAccountByIdInOpenRace(authService.getGuestIdByToken(guestToken));
 
-            int skillLevel = ThreadLocalRandom.current().nextInt(10, 101);
+                int skillLevel = ThreadLocalRandom.current().nextInt(10, 101);
 
-            launchSingleBot(roomCode, guestToken, null, joinToken, player, skillLevel);
+                launchSingleBot(race, guestToken, null, player, skillLevel);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
 
         for (int i = 0; i < registeredCount; i++) {
 
-            int currentCount = registeredCounter.getAndIncrement();
-            int botIndex = (currentCount % BotDataSeeder.TOTAL_BOTS_TO_CREATE) + 1;
+            try {
+                int currentCount = registeredCounter.getAndIncrement();
+                int botIndex = (currentCount % BotDataSeeder.TOTAL_BOTS_TO_CREATE) + 1;
 
-            String botName = "Bot_" + botIndex;
-            TokenEntity authToken = authService.generateTokenForBot(botIndex);
+                String botName = "Bot_" + botIndex;
+                TokenEntity authToken = authService.generateTokenForBot(botIndex);
 
-            RequestMetadata metadata = new RequestMetadata();
-            metadata.setAuthorization(authToken.getToken());
+                RequestMetadata metadata = new RequestMetadata();
+                metadata.setAuthorization(authToken.getToken());
 
-            String joinToken = raceService.joinRace(roomCode, new JoinRaceRequest(botName), metadata).getJoinToken();
-            RacePlayer player = (RacePlayer) raceService.findAccountByIdInOpenRace(authToken.getUser().getId().toString());
+                raceService.joinRace(race.getRoomCode(), new JoinRaceRequest(botName), metadata);
+                RacePlayer player = (RacePlayer) raceService.findAccountByIdInOpenRace(authToken.getUser().getId().toString());
 
-            // הגרלת רמת מיומנות בין 10 ל-100
-            int skillLevel = ThreadLocalRandom.current().nextInt(10, 101);
+                int skillLevel = ThreadLocalRandom.current().nextInt(10, 101);
 
-            launchSingleBot(roomCode, null, authToken.getToken(), joinToken, player, skillLevel);
+                launchSingleBot(race, null, authToken.getToken(), player, skillLevel);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
-    private void launchSingleBot(String roomCode, String guestToken, String authToken, String joinToken, RacePlayer player, int skillLevel) {
+    private void launchSingleBot(RaceManager race, String guestToken, String authToken, RacePlayer player, int skillLevel) {
         StompHeaders connectHeaders = new StompHeaders();
         connectHeaders.add("Is-Recovery", "false");
 
@@ -87,7 +95,7 @@ public class BotSwarmManager {
         }
 
         WebSocketHttpHeaders webSocketHttpHeaders = new WebSocketHttpHeaders();
-        BotRaceHandler botHandler = new BotRaceHandler(roomCode, joinToken, player, skillLevel);
+        BotRaceHandler botHandler = new BotRaceHandler(race, player, skillLevel);
 
         stompClient.connect(serverUrl + "/api/ws-race", webSocketHttpHeaders, connectHeaders, botHandler);
     }
