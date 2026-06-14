@@ -218,5 +218,27 @@
       "[IF:(#W)=0:<[NUM:value=(#TARGET:sub_(#D1)):#R]>:<[NUM:value=(#COLLECTED:add_(#D2)):#R]>]",
       "[IF:(#W)=0:<[NUM:value=(#LEFT:add_10):#R]>:<[NUM:value=(#COLLECTED:sub_10):#R]>]"
     ]
+  },
+  {
+    "id": "easy_logic_20",
+    "questionTemplate": "[HUMAN:*:#1][ITEM:unit_type=COUNT;type=FOOD|TOY:*:#I1][PLACE:*:#P1][NUM:min=3;max=6:*:#PARTS][NUM:min=6;max=12:*:#PER_PART][NUM:value=(#PARTS:mul_(#PER_PART)):*:#TOTAL][NUM:value=(#TOTAL:sub_(#PER_PART)):*:#LEFT][NUM:min=0;max=1:*:#W]ל-[#1:n] היו [#TOTAL] [#I1:p] ב[#P1:s]. [IF:(#1:g)=MALE:<הוא נתן>:<היא נתנה>] לחבר בדיוק 1 חלקי [#PARTS] מכל ה-[#I1:p] שהיו [#1:to_him_her]. [IF:(#W)=0:<כמה [#I1:p] קיבל החבר?>:<כמה [#I1:p] נשארו ל-[#1:n] בסוף?>]",
+    "answerTemplate": "[IF:(#W)=0:<[NUM:value=(#PER_PART):#R]>:<[NUM:value=(#LEFT):#R]>]",
+    "hintTemplate": "[IF:(#W)=0:<כדי למצוא כמה זה 1 חלקי [#PARTS], עליך לחלק את הכמות הכוללת ב-[#PARTS].>:<קודם חלק את הכמות הכוללת ב-[#PARTS] כדי לדעת כמה החבר קיבל, ואז חסר את זה מהכמות ההתחלתית.>]",
+    "distractorsTemplates": [
+      "[IF:(#W)=0:<[NUM:value=(#LEFT):#R]>:<[NUM:value=(#PER_PART):#R]>]",
+      "[IF:(#W)=0:<[NUM:value=(#TOTAL:sub_(#PARTS)):#R]>:<[NUM:value=(#TOTAL:sub_(#PARTS)):#R]>]",
+      "[IF:(#W)=0:<[NUM:value=(#PARTS):#R]>:<[NUM:value=(#TOTAL:add_(#PARTS)):#R]>]"
+    ]
+  },
+  {
+    "id": "easy_logic_21",
+    "questionTemplate": "[HUMAN:*:#1][PLACE:place_type=OUTDOORS:*:#P1][NUM:min=15;max=40:*:#SPEED][NUM:min=3;max=8:*:#TIME][NUM:value=(#SPEED:mul_(#TIME)):*:#DIST][NUM:min=0;max=1:*:#W][#1:n] [VERB:id=run:(past_+(#1:g)+_s)] ב[#P1:s]. הקצב היה בדיוק [#SPEED] מטרים בדקה. [IF:(#W)=0:<אם [#1:he_she] [VERB:id=run:(past_+(#1:g)+_s)] במשך [#TIME] דקות ברצף, איזה מרחק [IF:(#1:g)=MALE:<הוא עבר>:<היא עברה>] בסך הכול?>:<אם [IF:(#1:g)=MALE:<הוא עבר>:<היא עברה>] מרחק כולל של [#DIST] מטרים באותו הקצב, כמה דקות נמשכה הריצה?>]",
+    "answerTemplate": "[IF:(#W)=0:<[NUM:value=(#DIST):#R]>:<[NUM:value=(#TIME):#R]>]",
+    "hintTemplate": "[IF:(#W)=0:<כדי למצוא את הדרך, כפול את המהירות (קצב) בזמן.>:<כדי למצוא את הזמן, חלק את הדרך (המרחק הכולל) במהירות.>]",
+    "distractorsTemplates": [
+      "[IF:(#W)=0:<[NUM:value=(#DIST:add_(#SPEED)):#R]>:<[NUM:value=(#TIME:add_2):#R]>]",
+      "[IF:(#W)=0:<[NUM:value=(#SPEED:add_(#TIME)):#R]>:<[NUM:value=(#DIST:sub_(#SPEED)):#R]>]",
+      "[NUM:value=(#SPEED:mul_10):#R]"
+    ]
   }
 ]
