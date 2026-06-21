@@ -21,6 +21,7 @@ public enum ErrorCode {
 
     // Token & Security Errors (1100 Series)
     INVALID_TOKEN(1100, "The token is invalid or has expired."),
+    ADMIN_ACCESS_REQUIRED(1101, "Access denied. Administrator privileges are required to perform this action."),
 
     // Email Specific Errors (1200 Series)
     EMAIL_SEND_FAILED(1200, "Failed to send email. Please try again later."),
@@ -59,6 +60,10 @@ public enum ErrorCode {
 
     // Connection & Session Errors (1500 Series)
     INTENTIONAL_DISCONNECT(1500, "The connection was closed intentionally."),
+
+    // Template & Content Errors (1600 Series)
+    TEMPLATE_NOT_FOUND(1600, "No template found with the provided ID!"),
+    REPORT_NOT_FOUND(1601, "The requested report was not found or has been deleted!"),
 
     // System Errors
     INTERNAL_ERROR(9000, "An unexpected error occurred"),

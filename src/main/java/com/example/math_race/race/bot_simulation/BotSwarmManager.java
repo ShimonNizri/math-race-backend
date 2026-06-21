@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class BotSwarmManager {
 
     private final WebSocketStompClient stompClient;
-    private final String serverUrl = "ws://10.136.222.56:8085";
+    private final String serverUrl = "ws://10.36.92.56:8085";
 
     private final AtomicInteger guestCounter = new AtomicInteger(0);
     private final AtomicInteger registeredCounter = new AtomicInteger(0);

@@ -1,10 +1,13 @@
 package com.example.math_race.service;
 
 import com.example.math_race.dto.wsMessage.response.*;
+import com.example.math_race.entities.QuestionErrorReportEntity;
 import com.example.math_race.exception.ErrorCode;
 import com.example.math_race.questionGenerator.QuestionEngine;
+import com.example.math_race.questionGenerator.question.TemplateResult;
 import com.example.math_race.race.*;
 import com.example.math_race.questionGenerator.question.MathQuestion;
+import com.example.math_race.repositories.QuestionErrorReportRepository;
 import com.example.math_race.repositories.RaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,6 +34,7 @@ public class RaceEngineService {
     private final RaceRepository raceRepository;
     private final RandomEventEngine randomEventEngine;
     private final RaceService raceService;
+    private final QuestionErrorReportRepository  questionErrorReportRepository;
 
     private final Map<String, ScheduledFuture<?>> raceEndTimers = new ConcurrentHashMap<>();
     private final Map<String, ScheduledFuture<?>> playerQuestionTimers = new ConcurrentHashMap<>();
@@ -39,6 +43,7 @@ public class RaceEngineService {
     public RaceEngineService(
             @Qualifier(GAME_SCHEDULER_BEAN_NAME) ThreadPoolTaskScheduler scheduler, WebSocketService webSocketService,
             QuestionEngine questionEngine, RaceRepository raceRepository, RandomEventEngine randomEventEngine,
+            QuestionErrorReportRepository questionErrorReportRepository,
             QuestionTemplateService  questionTemplateService, @Lazy RaceService raceService) {
 
         this.scheduler = scheduler;
@@ -48,6 +53,7 @@ public class RaceEngineService {
         this.raceService = raceService;
         this.questionEngine = questionEngine;
         this.questionTemplateService = questionTemplateService;
+        this.questionErrorReportRepository = questionErrorReportRepository;
     }
 
     public void startRace(RaceManager race) {
@@ -217,7 +223,7 @@ public class RaceEngineService {
                 existingTimer.cancel(false);
             }
 
-            MathQuestion question = generateForPlayer(player);
+            MathQuestion question = generateForPlayer(race,player);
 
             player.setCurrentQuestion(question);
             player.setQuestionStartTimeAtMs(System.currentTimeMillis());
@@ -484,9 +490,25 @@ public class RaceEngineService {
         }
     }
 
-    public MathQuestion generateForPlayer(RacePlayer player) {
+    public MathQuestion generateForPlayer(RaceManager race, RacePlayer player) {
         String level = player.getTrackState().getLevel();
         if (level.isEmpty()) return null;
-        return questionEngine.processTemplate(questionTemplateService.getTemplateByDifficulty(level));
+        int i = 0;
+        TemplateResult<MathQuestion> question;
+        do {
+            if (i > 80) throw new RuntimeException();
+
+            question = questionEngine.processTemplate(questionTemplateService.getTemplateByDifficulty(level));
+            if (!question.isSuccess()){
+                questionErrorReportRepository.save(new QuestionErrorReportEntity(question, QuestionErrorReportEntity.ReporterType.SYSTEM,"-SYSTEM-","An error occurred while creating the template!"));
+            }else{
+                break;
+            }
+            i++;
+        }while (true);
+
+        race.getAllMathQuestions().put(question.data().getQuestionId(),question);
+
+        return question.data();
     }
 }

@@ -19,7 +19,7 @@ public class EmailService {
 
     private final EmailSender emailSender;
     private final TemplateEngine templateEngine;
-    private final String BASE_PATH = "http://10.136.222.56:5174";
+    private final String BASE_PATH = "http://10.36.92.56:5174";
 
 
     @Autowired

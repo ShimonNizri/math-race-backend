@@ -42,10 +42,10 @@ public class TokenService {
         if (tokenType == SESSION) {
             expiresAt = Date.from(Instant.now().plus(30, ChronoUnit.DAYS));
 
-        }else if (tokenType == VERIFICATION || tokenType == PASSWORD_RESET || tokenType == DELETE_ACCOUNT) {
+        }else if (tokenType == VERIFICATION || tokenType == PASSWORD_RESET || tokenType == DELETE_ACCOUNT || tokenType == ADMIN) {
             TokenEntity oldToken = tokenRepository.findLatestActiveToken(user,tokenType);
 
-            if (oldToken != null && Duration.between(oldToken.getCreationDate().toInstant(), now).toMinutes() <= 2) {
+            if (tokenType != ADMIN && oldToken != null && Duration.between(oldToken.getCreationDate().toInstant(), now).toMinutes() <= 2) {
                 throw new LogicException(ErrorCode.EMAIL_COOLDOWN_ACTIVE);
             }
 
@@ -54,8 +54,10 @@ public class TokenService {
                 expiresAt = Date.from(Instant.now().plus(24, ChronoUnit.HOURS));
             }else if (tokenType == PASSWORD_RESET) {
                 expiresAt = Date.from(Instant.now().plus(12, ChronoUnit.HOURS));
-            }else {
+            }else if (tokenType == DELETE_ACCOUNT) {
                 expiresAt = Date.from(Instant.now().plus(6, ChronoUnit.HOURS));
+            }else {
+                expiresAt = Date.from(Instant.now().plus(30, ChronoUnit.MINUTES));
             }
         }
 

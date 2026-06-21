@@ -1,6 +1,5 @@
 package com.example.math_race.dto.http.response;
 
-import com.example.math_race.entities.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,9 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProfileResponse {
-
-    private String username;
-    private String email;
-    private UserEntity.UserRole role;
+public class AdminTokenResponse {
+    private String token;
+    private int minutesToSaveToken;
 }

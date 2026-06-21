@@ -20,7 +20,9 @@ public class QuestionTemplatesRepository extends BaseRepository {
     }
 
     public List<QuestionTemplateEntity> loadAllTemplates() {
-        List<QuestionTemplateEntity> entities = loadList(QuestionTemplateEntity.class);
+        List<QuestionTemplateEntity> entities = getCurrentSession()
+                .createQuery("FROM QuestionTemplateEntity WHERE deleted = false", QuestionTemplateEntity.class)
+                .list();
 
         if (entities.isEmpty()) {
             entities = seeder.getAllTemplateEntitiesFromJson();
@@ -28,5 +30,12 @@ public class QuestionTemplatesRepository extends BaseRepository {
         }
 
         return entities;
+    }
+
+    public QuestionTemplateEntity loadByTemplateId(String templateId) {
+        return getCurrentSession()
+                .createQuery("FROM QuestionTemplateEntity WHERE templateId = :tId AND deleted = false", QuestionTemplateEntity.class)
+                .setParameter("tId", templateId)
+                .uniqueResult();
     }
 }

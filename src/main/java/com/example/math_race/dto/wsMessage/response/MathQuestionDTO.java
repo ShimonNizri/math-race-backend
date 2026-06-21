@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class MathQuestionDTO {
 
+    private String questionId;
     private String playerId;
     private String expression;
     private List<String> options;
@@ -25,6 +26,7 @@ public class MathQuestionDTO {
     private long sentAt;
 
     public MathQuestionDTO(RaceManager race, RacePlayer player, MathQuestion mathQuestion) {
+        this.questionId = mathQuestion.getQuestionId();
         this.playerId = player.getId();
         this.expression = mathQuestion.getExpression();
         this.options = mathQuestion.getOptions();

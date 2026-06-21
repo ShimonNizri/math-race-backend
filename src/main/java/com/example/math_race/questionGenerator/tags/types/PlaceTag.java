@@ -1,6 +1,7 @@
 package com.example.math_race.questionGenerator.tags.types;
 
 import com.example.math_race.entities.dictionary.PlaceEntity;
+import com.example.math_race.questionGenerator.question.WarningContext;
 import com.example.math_race.questionGenerator.tags.core.MatchableTag;
 import com.example.math_race.questionGenerator.tags.enums.Gender;
 import com.example.math_race.questionGenerator.tags.enums.ItemCategory;
@@ -67,7 +68,7 @@ public class PlaceTag implements MatchableTag {
             case "to_it" -> gender == Gender.MALE ? "אליו" : "אליה";
             case "from_it", "from_him_her" -> gender == Gender.MALE ? "ממנו" : "ממנה";
             default -> {
-                System.out.println("\u001B[31m" + "Warning: Unrecognized property key in PlaceTag.getProperty: '" + key + "'\u001B[0m");
+                WarningContext.addWarning("\u001B[31m" + "Warning: Unrecognized property key in PlaceTag.getProperty: '" + key + "'\u001B[0m");
                 yield singular;
             }
         };
@@ -91,7 +92,7 @@ public class PlaceTag implements MatchableTag {
                 case "id" -> reqId = value;
                 case "pt", "place_type" -> reqPlaceType = value;
                 case "t", "type", "c", "categories" -> reqType = value;
-                default -> System.out.println("\u001B[31m" + "Warning: Unrecognized constraint key in PlaceTag.matches: '" + key + "'\u001B[0m");
+                default -> WarningContext.addWarning("\u001B[31m" + "Warning: Unrecognized constraint key in PlaceTag.matches: '" + key + "'\u001B[0m");
             }
         }
 

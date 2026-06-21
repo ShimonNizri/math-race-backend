@@ -49,7 +49,7 @@ public class UserProfileService {
 
     public ProfileResponse getProfile(RequestMetadata metadata) {
        UserEntity user = authService.getValidUser(metadata);
-        return new ProfileResponse(user.getUsername(), user.getEmail());
+        return new ProfileResponse(user.getUsername(), user.getEmail(),user.getRole());
     }
 
 

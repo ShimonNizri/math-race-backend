@@ -1,6 +1,7 @@
 package com.example.math_race.questionGenerator.tags.types;
 
 import com.example.math_race.entities.dictionary.HumanEntity;
+import com.example.math_race.questionGenerator.question.WarningContext;
 import com.example.math_race.questionGenerator.tags.core.MatchableTag;
 import com.example.math_race.questionGenerator.tags.enums.Gender;
 import lombok.AllArgsConstructor;
@@ -41,7 +42,7 @@ public class HumanTag implements MatchableTag {
             case "loves", "likes" -> gender == Gender.MALE ? "אוהב" : "אוהבת";
             case "from_him_her" -> gender == Gender.MALE ? "ממנו" : "ממנה";
             default -> {
-                System.out.println("\u001B[31m" + "Warning: Unrecognized property key in HumanTag.getProperty: '" + key + "'\u001B[0m");
+                WarningContext.addWarning("\u001B[31m" + "Warning: Unrecognized property key in HumanTag.getProperty: '" + key + "'\u001B[0m");
                 yield name;
             }
         };
@@ -63,7 +64,7 @@ public class HumanTag implements MatchableTag {
             switch (key) {
                 case "g", "gender" -> reqGender = value;
                 case "n", "name" -> reqName = value;
-                default -> System.out.println("\u001B[31m" + "Warning: Unrecognized constraint key in HumanTag.matches: " + key + "\u001B[0m");
+                default -> WarningContext.addWarning("\u001B[31m" + "Warning: Unrecognized constraint key in HumanTag.matches: " + key + "\u001B[0m");
             }
         }
 

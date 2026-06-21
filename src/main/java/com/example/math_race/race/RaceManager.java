@@ -2,6 +2,8 @@ package com.example.math_race.race;
 
 import com.example.math_race.exception.ErrorCode;
 import com.example.math_race.exception.LogicException;
+import com.example.math_race.questionGenerator.question.MathQuestion;
+import com.example.math_race.questionGenerator.question.TemplateResult;
 import lombok.Data;
 
 import java.util.*;
@@ -14,6 +16,8 @@ public class RaceManager {
 
     private final RaceSettings settings;
     private String roomCode;
+
+    private Map<String, TemplateResult<MathQuestion>> allMathQuestions = new ConcurrentHashMap<>();
 
     private RaceHost host;
     private final Map<String, RacePlayer> players;

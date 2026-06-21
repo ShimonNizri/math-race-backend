@@ -177,13 +177,17 @@ public class AuthService {
         return null;
     }
 
+
     public UserEntity getValidUser(RequestMetadata metadata) {
+     return getValidUser(metadata,SESSION);
+    }
+    public UserEntity getValidUser(RequestMetadata metadata, TokenEntity.TokenType type) {
         TokenEntity token = null;
         if (StringUtils.hasText(metadata.getAuthorization())) {
             token = tokenRepository.findByToken(metadata.getAuthorization());
         }
 
-        if (token == null || !token.isValid() || token.isDeleted() || token.getType() != SESSION) {
+        if (token == null || !token.isValid() || token.isDeleted() || token.getType() != type) {
             throw new LogicException(ErrorCode.INVALID_TOKEN);
         }
 
@@ -206,6 +210,10 @@ public class AuthService {
 
         guestSessions.put(sessionToken, guestId);
         return new CreateGuestTokenResponse(sessionToken,30);
+    }
+
+    public boolean isGuestId(String id) {
+        return id.startsWith("Guest-");
     }
 
     @Transactional

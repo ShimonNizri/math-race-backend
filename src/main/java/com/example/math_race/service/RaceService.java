@@ -10,12 +10,15 @@ import com.example.math_race.dto.http.response.PlayerRemoveDTO;
 import com.example.math_race.dto.http.response.RaceInfoResponse;
 import com.example.math_race.dto.wsMessage.request.*;
 import com.example.math_race.dto.wsMessage.response.*;
+import com.example.math_race.entities.QuestionErrorReportEntity;
 import com.example.math_race.entities.UserEntity;
 import com.example.math_race.exception.ErrorCode;
 import com.example.math_race.exception.LogicException;
+import com.example.math_race.questionGenerator.question.MathQuestion;
+import com.example.math_race.questionGenerator.question.TemplateResult;
 import com.example.math_race.race.*;
-import com.example.math_race.race.bot_simulation.BotRaceHandler;
 import com.example.math_race.race.bot_simulation.BotSwarmManager;
+import com.example.math_race.repositories.QuestionErrorReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static com.example.math_race.entities.QuestionErrorReportEntity.ReporterType.*;
 import static com.example.math_race.service.WebSocketService.*;
 
 @Service
@@ -36,11 +40,13 @@ public class RaceService {
     private final BotSwarmManager botSwarmManager;
     private final Map<String, RaceManager> allRaces =  new ConcurrentHashMap<>();
     private final Map<String, String> accountIdToOpenRoomCode = new ConcurrentHashMap<>();
+    private final QuestionErrorReportRepository questionErrorReportRepository;
 
     @Autowired
-    public RaceService(BotSwarmManager botSwarmManager, AuthService authService, WebSocketService webSocketService, RaceEngineService raceEngineService) {
+    public RaceService(BotSwarmManager botSwarmManager, AuthService authService, QuestionErrorReportRepository questionErrorReportRepository, WebSocketService webSocketService, RaceEngineService raceEngineService) {
         this.authService = authService;
         this.webSocketService = webSocketService;
+        this.questionErrorReportRepository = questionErrorReportRepository;
         this.raceEngineService = raceEngineService;
         this.botSwarmManager = botSwarmManager;
     }
@@ -187,6 +193,19 @@ public class RaceService {
             webSocketService.sendSuccessToQueueSession(QUEUE_NOTIFICATIONS, "NO_JOINED_RACE_FOUND",
                     null,accessor);
         }
+    }
+
+    public void reportTemplate(String roomCode,ReportTemplateRequest request, StompHeaderAccessor accessor){
+        RaceManager raceManager = findOpenRaceByRoomCode(roomCode);
+        TemplateResult<MathQuestion> templateResult = raceManager.getAllMathQuestions().get(request.getQuestionId());
+        if (templateResult != null){
+            String accountId = accessor.getUser().getName();
+            boolean isUser = !authService.isGuestId(accountId);
+            questionErrorReportRepository.save(new QuestionErrorReportEntity(templateResult,isUser ? REGISTERED_USER:GUEST,accountId,request.getUserComment()));
+        }
+
+        String type = templateResult != null ? "REPORT_RECEIVED" : "REPORT_NOT_RECEIVED";
+        webSocketService.sendSuccessToQueueSession(QUEUE_RACE_FEEDBACK, type,null,accessor);
     }
 
     public void sendRaceState(String roomCode, StompHeaderAccessor accessor){

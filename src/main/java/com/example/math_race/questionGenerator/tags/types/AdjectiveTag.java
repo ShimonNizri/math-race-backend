@@ -1,6 +1,7 @@
 package com.example.math_race.questionGenerator.tags.types;
 
 import com.example.math_race.entities.dictionary.AdjectiveEntity;
+import com.example.math_race.questionGenerator.question.WarningContext;
 import com.example.math_race.questionGenerator.tags.core.MatchableTag;
 import com.example.math_race.questionGenerator.tags.enums.AdjectiveType;
 import com.example.math_race.questionGenerator.tags.enums.Gender;
@@ -57,7 +58,7 @@ public class AdjectiveTag implements MatchableTag {
         if (forms.containsKey(newKey)) {
             return forms.get(newKey);
         } else {
-            System.out.println("\u001B[31m" + "Warning: Unrecognized property key in AdjectiveTag.getProperty: '" + key + "'\u001B[0m");
+            WarningContext.addWarning("\u001B[31m" + "Warning: Unrecognized property key in AdjectiveTag.getProperty: '" + key + "'\u001B[0m");
             return id;
         }
     }
@@ -88,7 +89,7 @@ public class AdjectiveTag implements MatchableTag {
             switch (key) {
                 case "id" -> reqId = value;
                 case "t", "type" -> reqType = value;
-                default -> System.out.println("\u001B[31m" + "Warning: Unrecognized constraint key in AdjectiveTag.matches: " + key + "\u001B[0m");
+                default -> WarningContext.addWarning("\u001B[31m" + "Warning: Unrecognized constraint key in AdjectiveTag.matches: " + key + "\u001B[0m");
             }
         }
 

@@ -1,5 +1,6 @@
 package com.example.math_race.questionGenerator.tags.types;
 
+import com.example.math_race.questionGenerator.question.WarningContext;
 import com.example.math_race.questionGenerator.tags.core.TemplateTag;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,14 +31,14 @@ public class NumberTag implements TemplateTag {
                     this.value = randomNumber;
                 }
             } catch (NumberFormatException e) {
-                System.out.println("\u001B[31m" + "Warning: Invalid forbidden value format ('" + valStr + "'). Generating random number." + "\u001B[0m");
+                WarningContext.addWarning("\u001B[31m" + "Warning: Invalid forbidden value format ('" + valStr + "'). Generating random number." + "\u001B[0m");
                 this.value = java.util.concurrent.ThreadLocalRandom.current().nextInt(this.min, this.max + 1);
             }
         } else {
             try {
                 this.value = Integer.parseInt(valStr);
             } catch (NumberFormatException e) {
-                System.out.println("\u001B[31m" + "Warning: Invalid value format ('" + valStr + "'). Generating random number." + "\u001B[0m");
+                WarningContext.addWarning("\u001B[31m" + "Warning: Invalid value format ('" + valStr + "'). Generating random number." + "\u001B[0m");
                 this.value = java.util.concurrent.ThreadLocalRandom.current().nextInt(this.min, this.max + 1);
             }
         }
@@ -75,7 +76,7 @@ public class NumberTag implements TemplateTag {
                 if (divisor != 0) {
                     return String.valueOf(value / divisor);
                 } else {
-                    System.out.println("\u001B[31m" + "Warning: Division by zero requested in NumberTag: '" + key + "'\u001B[0m");
+                    WarningContext.addWarning("\u001B[31m" + "Warning: Division by zero requested in NumberTag: '" + key + "'\u001B[0m");
                     return String.valueOf(value);
                 }
             }
@@ -84,16 +85,16 @@ public class NumberTag implements TemplateTag {
                 if (divisor != 0) {
                     return String.valueOf(value % divisor);
                 } else {
-                    System.out.println("\u001B[31m" + "Warning: Modulo by zero requested in NumberTag: '" + key + "'\u001B[0m");
+                    WarningContext.addWarning("\u001B[31m" + "Warning: Modulo by zero requested in NumberTag: '" + key + "'\u001B[0m");
                     return String.valueOf(value);
                 }
             }
         } catch (NumberFormatException e) {
-            System.out.println("\u001B[31m" + "Warning: Invalid number in operation in NumberTag.getProperty: '" + key + "'\u001B[0m");
+            WarningContext.addWarning("\u001B[31m" + "Warning: Invalid number in operation in NumberTag.getProperty: '" + key + "'\u001B[0m");
             return String.valueOf(value);
         }
 
-        System.out.println("\u001B[31m" + "Warning: Unrecognized property key in NumberTag.getProperty: '" + key + "'\u001B[0m");
+        WarningContext.addWarning("\u001B[31m" + "Warning: Unrecognized property key in NumberTag.getProperty: '" + key + "'\u001B[0m");
         return String.valueOf(value);
     }
 }

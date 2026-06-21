@@ -1,5 +1,6 @@
 package com.example.math_race;
 
+import com.example.math_race.entities.QuestionErrorReportEntity;
 import com.example.math_race.questionGenerator.QuestionEngine;
 import com.example.math_race.questionGenerator.question.QuestionTemplate;
 import com.example.math_race.questionGenerator.question.MathQuestion;
@@ -33,9 +34,9 @@ class MathRaceApplicationTests {
 
 
         for (QuestionTemplate questionTemplate : allTemplates) {
-            MathQuestion mathQuestion = questionEngine.processTemplate(questionTemplate);
+            MathQuestion mathQuestion = questionEngine.processTemplate(questionTemplate).data();
 
-            System.out.println(mathQuestion.getId());
+            System.out.println(mathQuestion.getTemplateId());
             System.out.println("השאלה:");
             System.out.println(mathQuestion.getExpression());
             System.out.println("התשובה : " + mathQuestion.getCorrectAnswer());
@@ -56,9 +57,14 @@ class MathRaceApplicationTests {
 
 
         Map<String, TemplateTag> memoryTags = new HashMap<>();
-        String re = questionEngine.evaluateTemplate(template, memoryTags);
+        String re = questionEngine.evaluateTemplateExternal(template, memoryTags).data();
 
         System.out.println(re);
+    }
+
+    @Test
+    void testTemplate() {
+        System.out.println(new QuestionErrorReportEntity(questionEngine.processTemplate(questionTemplateService.getTemplateByDifficulty("easy")),null,null,null).toString());
     }
 
 }

@@ -103,6 +103,11 @@ public class RaceController {
         raceService.checkJoinedRace(accessor);
     }
 
+    @MessageMapping("/race/{roomCode}/player/report-template")
+    public void handleReportTemplate(@DestinationVariable String roomCode, @Valid @Payload ReportTemplateRequest request, StompHeaderAccessor accessor) {
+        raceService.reportTemplate(roomCode, request, accessor);
+    }
+
     @PostMapping("/create")
     public ApiResponse<CreateRaceResponse> createRace(@Valid @RequestBody CreateRaceRequest request, RequestMetadata metadata) {
         CreateRaceResponse createRaceResponse = raceService.creatRace(request, metadata);

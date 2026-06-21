@@ -1,6 +1,7 @@
 package com.example.math_race.questionGenerator.tags.types;
 
 import com.example.math_race.entities.dictionary.VerbEntity;
+import com.example.math_race.questionGenerator.question.WarningContext;
 import com.example.math_race.questionGenerator.tags.core.MatchableTag;
 import com.example.math_race.questionGenerator.tags.enums.Gender;
 import com.example.math_race.questionGenerator.tags.enums.Plurality;
@@ -65,7 +66,7 @@ public class VerbTag implements MatchableTag {
         if (forms.containsKey(newKey)) {
             return forms.get(newKey);
         } else {
-            System.out.println("\u001B[31m" + "Warning: Unrecognized property key in VerbTag.getProperty: '" + key + "'\u001B[0m");
+            WarningContext.addWarning("\u001B[31m" + "Warning: Unrecognized property key in VerbTag.getProperty: '" + key + "'\u001B[0m");
             return id;
         }
     }
@@ -95,7 +96,7 @@ public class VerbTag implements MatchableTag {
             if (key.equals("id")) {
                 reqId = value;
             } else {
-                System.out.println("\u001B[31m" + "Warning: Unrecognized constraint key in VerbTag.matches: '" + key + "'\u001B[0m");
+                WarningContext.addWarning("\u001B[31m" + "Warning: Unrecognized constraint key in VerbTag.matches: '" + key + "'\u001B[0m");
             }
         }
 

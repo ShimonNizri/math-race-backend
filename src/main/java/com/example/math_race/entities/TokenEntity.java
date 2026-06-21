@@ -15,7 +15,8 @@ public class TokenEntity extends BaseEntity {
         SESSION,
         VERIFICATION,
         PASSWORD_RESET,
-        DELETE_ACCOUNT
+        DELETE_ACCOUNT,
+        ADMIN
     }
 
     private String token;

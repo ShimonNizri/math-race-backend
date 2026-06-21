@@ -1,6 +1,7 @@
 package com.example.math_race.questionGenerator.tags.types;
 
 import com.example.math_race.entities.dictionary.ItemEntity;
+import com.example.math_race.questionGenerator.question.WarningContext;
 import com.example.math_race.questionGenerator.tags.core.MatchableTag;
 import com.example.math_race.questionGenerator.tags.enums.Gender;
 import com.example.math_race.questionGenerator.tags.enums.ItemCategory;
@@ -66,7 +67,7 @@ public class ItemTag implements MatchableTag {
                         .collect(java.util.stream.Collectors.joining("|"));
             }
             default -> {
-                System.out.println("\u001B[31m" + "Warning: Unrecognized property key in ItemTag.getProperty: '" + key + "'\u001B[0m");
+                WarningContext.addWarning("\u001B[31m" + "Warning: Unrecognized property key in ItemTag.getProperty: '" + key + "'\u001B[0m");
                 yield singular;
             }
         };
@@ -90,7 +91,7 @@ public class ItemTag implements MatchableTag {
                 case "t", "type", "c", "categories" -> reqType = value;
                 case "u", "unit", "unit_type", "allowed_unit" -> reqUnit = value;
                 case "id" -> reqId = value;
-                default -> System.out.println("\u001B[31m" + "Warning: Unrecognized constraint key in ItemTag.matches: '" + key + "'\u001B[0m");
+                default -> WarningContext.addWarning("\u001B[31m" + "Warning: Unrecognized constraint key in ItemTag.matches: '" + key + "'\u001B[0m");
             }
         }
 

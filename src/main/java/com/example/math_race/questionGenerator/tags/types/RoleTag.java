@@ -1,6 +1,7 @@
 package com.example.math_race.questionGenerator.tags.types;
 
 import com.example.math_race.entities.dictionary.RoleEntity;
+import com.example.math_race.questionGenerator.question.WarningContext;
 import com.example.math_race.questionGenerator.tags.core.MatchableTag;
 import com.example.math_race.questionGenerator.tags.enums.RoleType;
 
@@ -60,7 +61,7 @@ public class RoleTag implements MatchableTag {
             case "f_s", "female_s", "f_singular" -> singularFemale;
             case "f_p", "female_p", "f_plural" -> pluralFemale;
             default -> {
-                System.out.println("\u001B[31m" + "Warning: Unrecognized property key in RoleTag.getProperty: '" + key + "'\u001B[0m");
+                WarningContext.addWarning("\u001B[31m" + "Warning: Unrecognized property key in RoleTag.getProperty: '" + key + "'\u001B[0m");
                 yield singularMale;
             }
         };
@@ -84,7 +85,7 @@ public class RoleTag implements MatchableTag {
                 case "id" -> reqId = value;
                 case "rt", "r_t", "role_type" -> reqRoleType = value;
                 case "vp", "v_p", "valid_places", "place_id" -> reqPlaceId = value;
-                default -> System.out.println("\u001B[31m" + "Warning: Unrecognized constraint key in RoleTag.matches: '" + key + "'\u001B[0m");
+                default -> WarningContext.addWarning("\u001B[31m" + "Warning: Unrecognized constraint key in RoleTag.matches: '" + key + "'\u001B[0m");
             }
         }
 

@@ -5,6 +5,8 @@ import com.example.math_race.json.models.seeders.DictionaryJsonSeeder;
 import com.example.math_race.questionGenerator.dictionary.DictionaryProvider;
 import com.example.math_race.questionGenerator.question.MathQuestion;
 import com.example.math_race.questionGenerator.question.QuestionTemplate;
+import com.example.math_race.questionGenerator.question.TemplateResult;
+import com.example.math_race.questionGenerator.question.WarningContext;
 import com.example.math_race.questionGenerator.tags.core.MatchableTag;
 import com.example.math_race.questionGenerator.tags.core.TemplateTag;
 import com.example.math_race.questionGenerator.tags.core.TagInfo;
@@ -53,47 +55,74 @@ public class QuestionEngine {
         this.roles = dictionaryProvider.loadRoleTag();
     }
 
-    public MathQuestion processTemplate(QuestionTemplate questionTemplate) {
-        Map<String, TemplateTag> memory = new HashMap<>();
+    public TemplateResult<MathQuestion> processTemplate(QuestionTemplate questionTemplate) {
+        WarningContext.enter();
+        try {
+            Map<String, TemplateTag> memory = new HashMap<>();
 
-        String questionText = evaluateTemplate(questionTemplate.questionTemplate(), memory);
-        String correctAnswer = evaluateTemplate(questionTemplate.answerTemplate(), memory);
+            String questionText = evaluateTemplate(questionTemplate.questionTemplate(), memory);
+            String correctAnswer = evaluateTemplate(questionTemplate.answerTemplate(), memory);
 
-        List<String> options = new ArrayList<>();
-        options.add(correctAnswer);
+            List<String> options = new ArrayList<>();
+            options.add(correctAnswer);
 
-        if (questionTemplate.distractorsTemplates() != null) {
-            for (String distractor : questionTemplate.distractorsTemplates()) {
+            if (questionTemplate.distractorsTemplates() != null) {
+                for (String distractor : questionTemplate.distractorsTemplates()) {
 
-                String distractorValue = evaluateTemplate(distractor, memory);
-                while (options.contains(distractorValue)) {
-                    try {
-                        int val = Integer.parseInt(distractorValue);
-                        distractorValue = String.valueOf(val + 1);
-                    } catch (NumberFormatException e) {
-                        distractorValue = distractorValue + " ";
-                        break;
+                    String distractorValue = evaluateTemplate(distractor, memory);
+                    while (options.contains(distractorValue)) {
+                        try {
+                            int val = Integer.parseInt(distractorValue);
+                            distractorValue = String.valueOf(val + 1);
+                        } catch (NumberFormatException e) {
+                            distractorValue = distractorValue + " ";
+                            break;
+                        }
                     }
+
+                    options.add(distractorValue);
                 }
-
-                options.add(distractorValue);
             }
+
+            Collections.shuffle(options);
+
+            MathQuestion mathQuestion = new MathQuestion();
+            mathQuestion.setTemplateId(questionTemplate.id());
+            mathQuestion.setQuestionId(UUID.randomUUID().toString());
+            mathQuestion.setExpression(questionText + " תשובה נכונה  : " + correctAnswer);
+            mathQuestion.setCorrectAnswer(correctAnswer);
+            mathQuestion.setOptions(options);
+            mathQuestion.setHint(evaluateTemplate(questionTemplate.hintTemplate(), memory));
+
+
+            List<String> errors = WarningContext.exit();
+            return new TemplateResult<>(mathQuestion, errors,memory);
+
+        }catch (Exception e) {
+            WarningContext.exit();
+            throw e;
         }
-
-        Collections.shuffle(options);
-
-
-        MathQuestion mathQuestion = new MathQuestion();
-        mathQuestion.setId(questionTemplate.id());
-        mathQuestion.setExpression(questionText + " תשובה נכונה  : " + correctAnswer);
-        mathQuestion.setCorrectAnswer(correctAnswer);
-        mathQuestion.setOptions(options);
-        mathQuestion.setHint(evaluateTemplate(questionTemplate.hintTemplate(), memory));
-
-        return mathQuestion;
     }
 
-    public String evaluateTemplate(String template, Map<String, TemplateTag> memory) {
+    public TemplateResult<String> evaluateTemplateExternal(String template) {
+        return evaluateTemplateExternal(template,new HashMap<>());
+    }
+
+    public TemplateResult<String> evaluateTemplateExternal(String template, Map<String, TemplateTag> memory) {
+        WarningContext.enter();
+        try {
+            String resultText = evaluateTemplate(template, memory);
+
+            List<String> errors = WarningContext.exit();
+            return new TemplateResult<>(resultText, errors,memory);
+
+        } catch (Exception e) {
+            WarningContext.exit();
+            throw e;
+        }
+    }
+
+    private String evaluateTemplate(String template, Map<String, TemplateTag> memory) {
         Set<String> tags = extractUniqueTags(template);
 
         if (memory == null) {
@@ -145,7 +174,7 @@ public class QuestionEngine {
 
                     if (isTemp) memory.remove(tagId);
                 } else {
-                    System.out.println("\u001B[31m" + "Warning: No match found for type [" + info.getType() + "] with constraints: " + resolvedConstraints + "\u001B[0m");
+                    WarningContext.addWarning("\u001B[31m" + "Warning: No match found for type [" + info.getType() + "] with constraints: " + resolvedConstraints + "\u001B[0m");
                 }
             } else {
                 if (memory.containsKey(info.getId())) {
@@ -235,7 +264,7 @@ public class QuestionEngine {
 
                 return isNot ? "!" + finalValue : finalValue;
             } else {
-                System.out.println("\u001B[31m" + "the id : " + id + " does not exist in the memory" + "\u001B[0m");
+                WarningContext.addWarning("\u001B[31m" + "the id : " + id + " does not exist in the memory" + "\u001B[0m");
             }
         }
 
@@ -315,7 +344,7 @@ public class QuestionEngine {
                             default -> false;
                         };
                     } catch (NumberFormatException nfe) {
-                        System.out.println("\u001B[31m" + "Warning: Numeric comparison failed for actual: [" + leftSide + "] and expected: [" + rightSide + "]" + "\u001B[0m");
+                        WarningContext.addWarning("\u001B[31m" + "Warning: Numeric comparison failed for actual: [" + leftSide + "] and expected: [" + rightSide + "]" + "\u001B[0m");
                     }
                 }
 
@@ -325,7 +354,7 @@ public class QuestionEngine {
                 result = result.replace(currentTag, resolvedText);
             }
         } catch (Exception e) {
-            System.out.println("\u001B[31m" + "Error parsing IF tag: " + tag + "\u001B[0m");
+            WarningContext.addWarning("\u001B[31m" + "Error parsing IF tag: " + tag + "\u001B[0m");
         }
 
         return result;
@@ -337,7 +366,7 @@ public class QuestionEngine {
                 .toList();
 
         if (matches.isEmpty()) {
-            System.out.println("\u001B[31m" + "Warning: No " + clazz.getSimpleName() + " matches constraints: " + constraints + "\u001B[0m");
+            WarningContext.addWarning("\u001B[31m" + "Warning: No " + clazz.getSimpleName() + " matches constraints: " + constraints + "\u001B[0m");
             return null;
         }
 
@@ -362,14 +391,14 @@ public class QuestionEngine {
                     try {
                         min = Integer.parseInt(value);
                     } catch (NumberFormatException e) {
-                        System.out.println("\u001B[31m" + "Warning: Invalid min format." + "\u001B[0m");
+                        WarningContext.addWarning("\u001B[31m" + "Warning: Invalid min format." + "\u001B[0m");
                     }
                 }
                 case "max" -> {
                     try {
                         max = Integer.parseInt(value);
                     } catch (NumberFormatException e) {
-                        System.out.println("\u001B[31m" + "Warning: Invalid max format." + "\u001B[0m");
+                        WarningContext.addWarning("\u001B[31m" + "Warning: Invalid max format." + "\u001B[0m");
                     }
                 }
                 case "value", "v" -> valStr = value;
@@ -404,14 +433,14 @@ public class QuestionEngine {
                     try {
                         minMinutes = TimeTag.parseTime(value);
                     } catch (Exception e) {
-                        System.out.println("\u001B[31m" + "Warning: Invalid min time format." + "\u001B[0m");
+                        WarningContext.addWarning("\u001B[31m" + "Warning: Invalid min time format." + "\u001B[0m");
                     }
                 }
                 case "max" -> {
                     try {
                         maxMinutes = TimeTag.parseTime(value);
                     } catch (Exception e) {
-                        System.out.println("\u001B[31m" + "Warning: Invalid max time format." + "\u001B[0m");
+                        WarningContext.addWarning("\u001B[31m" + "Warning: Invalid max time format." + "\u001B[0m");
                     }
                 }
                 case "round", "r" -> round = !value.equalsIgnoreCase("false");

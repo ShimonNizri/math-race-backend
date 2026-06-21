@@ -331,7 +331,8 @@
             <key not-null="true">
                 <column name="role_uuid" length="16" />
             </key>
-            <element column="place_id" type="string"/> </set>
+            <element column="place_id" type="string"/>
+        </set>
 
         <property name="creationDate" type="java.util.Date" column="creation_date" not-null="true"/>
         <property name="updatedDate" type="java.util.Date" column="updated_date"/>
@@ -396,7 +397,6 @@
             </key>
 
             <composite-element class="com.example.math_race.entities.dictionary.VerbFormEntry">
-
                 <property name="tense" column="form_tense" length="20" not-null="true">
                     <type name="org.hibernate.type.EnumType">
                         <param name="enumClass">com.example.math_race.questionGenerator.tags.enums.Tense</param>
@@ -429,7 +429,6 @@
     </class>
 
     <class name="com.example.math_race.entities.templates.QuestionTemplateEntity" table="question_templates" lazy="false">
-
         <id name="id" type="org.hibernate.type.UUIDBinaryType">
             <column name="id" length="16" />
             <generator class="org.hibernate.id.UUIDGenerator"/>
@@ -449,6 +448,43 @@
         <property name="updatedDate" type="java.util.Date" column="updated_date"/>
         <property name="deleted" type="boolean" column="deleted" not-null="true"/>
         <property name="deletionDate" type="java.util.Date" column="deletion_date"/>
-
     </class>
+
+    <class name="com.example.math_race.entities.QuestionErrorReportEntity" table="question_error_reports" lazy="false">
+        <id name="id" type="org.hibernate.type.UUIDBinaryType">
+            <column name="id" length="16" />
+            <generator class="org.hibernate.id.UUIDGenerator"/>
+        </id>
+
+        <property name="templateId" type="string" column="template_id" index="idx_error_template_id"/>
+
+        <property name="status" column="report_status" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">com.example.math_race.entities.QuestionErrorReportEntity$ReportStatus</param>
+                <param name="useNamed">true</param>
+            </type>
+        </property>
+
+        <property name="reporterType" column="reporter_type" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">com.example.math_race.entities.QuestionErrorReportEntity$ReporterType</param>
+                <param name="useNamed">true</param>
+            </type>
+        </property>
+
+        <property name="reporterId" type="string" column="reporter_id" index="idx_error_reporter_id"/>
+        <property name="userComment" type="string" column="user_comment" length="1000"/>
+
+        <property name="expression" type="string" column="expression" length="2000"/>
+        <property name="options" type="string" column="options" length="1000"/>
+        <property name="hint" type="string" column="hint" length="1000"/>
+        <property name="errors" type="string" column="errors" length="2000"/>
+        <property name="tagMemoryJson" type="string" column="tag_memory_json" length="4000"/>
+
+        <property name="creationDate" type="java.util.Date" column="creation_date" not-null="true"/>
+        <property name="updatedDate" type="java.util.Date" column="updated_date"/>
+        <property name="deleted" type="boolean" column="deleted" not-null="true"/>
+        <property name="deletionDate" type="java.util.Date" column="deletion_date"/>
+    </class>
+
 </hibernate-mapping>

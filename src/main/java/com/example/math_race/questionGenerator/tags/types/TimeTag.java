@@ -1,5 +1,6 @@
 package com.example.math_race.questionGenerator.tags.types;
 
+import com.example.math_race.questionGenerator.question.WarningContext;
 import com.example.math_race.questionGenerator.tags.core.TemplateTag;
 
 public class TimeTag implements TemplateTag {
@@ -25,14 +26,14 @@ public class TimeTag implements TemplateTag {
                     this.totalMinutes = generateRandomTime(round, forbiddenValue);
                 }
             } catch (Exception e) {
-                System.out.println("\u001B[31m" + "Warning: Invalid forbidden time format ('" + valStr + "'). Generating random time." + "\u001B[0m");
+                WarningContext.addWarning("\u001B[31m" + "Warning: Invalid forbidden time format ('" + valStr + "'). Generating random time." + "\u001B[0m");
                 this.totalMinutes = generateRandomTime(round, -1);
             }
         } else {
             try {
                 this.totalMinutes = parseTime(valStr);
             } catch (Exception e) {
-                System.out.println("\u001B[31m" + "Warning: Invalid time format ('" + valStr + "'). Generating random time." + "\u001B[0m");
+                WarningContext.addWarning("\u001B[31m" + "Warning: Invalid time format ('" + valStr + "'). Generating random time." + "\u001B[0m");
                 this.totalMinutes = generateRandomTime(round, -1);
             }
         }
@@ -79,11 +80,11 @@ public class TimeTag implements TemplateTag {
             }
 
         } catch (NumberFormatException e) {
-            System.out.println("\u001B[31m" + "Warning: Invalid number in time operation in TimeTag: '" + key + "'\u001B[0m");
+            WarningContext.addWarning("\u001B[31m" + "Warning: Invalid number in time operation in TimeTag: '" + key + "'\u001B[0m");
             return formatTime(totalMinutes);
         }
 
-        System.out.println("\u001B[31m" + "Warning: Unrecognized property key in TimeTag.getProperty: '" + key + "'\u001B[0m");
+        WarningContext.addWarning("\u001B[31m" + "Warning: Unrecognized property key in TimeTag.getProperty: '" + key + "'\u001B[0m");
         return formatTime(totalMinutes);
     }
 

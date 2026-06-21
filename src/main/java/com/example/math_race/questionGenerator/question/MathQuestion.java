@@ -10,7 +10,8 @@ import java.util.List;
 @AllArgsConstructor
 public class MathQuestion {
 
-    private String id;
+    private String templateId;
+    private String questionId;
     private String expression;
     private List<String> options;
     private String hint;
