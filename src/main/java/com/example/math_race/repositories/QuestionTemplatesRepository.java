@@ -1,6 +1,6 @@
 package com.example.math_race.repositories;
 
-import com.example.math_race.entities.templates.QuestionTemplateEntity;
+import com.example.math_race.entities.QuestionTemplateEntity;
 import com.example.math_race.json.models.seeders.TemplateJsonSeeder;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;

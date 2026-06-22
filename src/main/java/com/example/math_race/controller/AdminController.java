@@ -4,10 +4,7 @@ import com.example.math_race.dto.http.ApiResponse;
 import com.example.math_race.dto.http.request.QuestionReportFilterRequest;
 import com.example.math_race.dto.http.request.QuestionTemplateUpdateRequest;
 import com.example.math_race.dto.http.request.RequestMetadata;
-import com.example.math_race.dto.http.response.AdminTokenResponse;
-import com.example.math_race.dto.http.response.QuestionErrorReportResponse;
-import com.example.math_race.dto.http.response.QuestionTemplateResponse;
-import com.example.math_race.dto.http.response.QuestionTemplateTestResponse;
+import com.example.math_race.dto.http.response.*;
 import com.example.math_race.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -44,13 +41,9 @@ public class AdminController {
         return ApiResponse.success(templateContent);
     }
 
-    // 2. דיבוג בעזרת AI לפי מזהה הדיווח
     @PostMapping("/question-reports/{reportId}/debug-ai")
-    public ApiResponse<String> debugTemplateWithAI(
-            @PathVariable String reportId,
-            RequestMetadata metadata) {
-        // מחזיר את התשובה של ה-AI כמחרוזת
-        String aiResponse = "לא עובד כעת"; //adminService.analyzeReportWithAI(reportId, metadata);
+    public ApiResponse<TemplateDebugResponse> debugTemplateWithAI(@PathVariable String reportId, RequestMetadata metadata) {
+        TemplateDebugResponse aiResponse = adminService.analyzeReportWithAI(reportId, metadata);
         return ApiResponse.success(aiResponse);
     }
 

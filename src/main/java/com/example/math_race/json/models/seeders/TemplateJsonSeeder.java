@@ -1,6 +1,6 @@
 package com.example.math_race.json.models.seeders;
 
-import com.example.math_race.entities.templates.QuestionTemplateEntity;
+import com.example.math_race.entities.QuestionTemplateEntity;
 
 import com.example.math_race.json.models.questions.QuestionTemplateJsonModel;
 import com.fasterxml.jackson.core.type.TypeReference;

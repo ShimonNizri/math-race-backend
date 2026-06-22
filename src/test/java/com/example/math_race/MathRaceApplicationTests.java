@@ -1,10 +1,12 @@
 package com.example.math_race;
 
+import com.example.math_race.GeminiApi.TemplateCreationRequest;
 import com.example.math_race.entities.QuestionErrorReportEntity;
 import com.example.math_race.questionGenerator.QuestionEngine;
 import com.example.math_race.questionGenerator.question.QuestionTemplate;
 import com.example.math_race.questionGenerator.question.MathQuestion;
 import com.example.math_race.questionGenerator.tags.core.TemplateTag;
+import com.example.math_race.service.GeminiService;
 import com.example.math_race.service.QuestionTemplateService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ class MathRaceApplicationTests {
 
 	@Autowired
 	QuestionEngine questionEngine;
+
+    @Autowired
+    GeminiService geminiService;
 
     @Test
     void contextLoads() {
@@ -65,6 +70,11 @@ class MathRaceApplicationTests {
     @Test
     void testTemplate() {
         System.out.println(new QuestionErrorReportEntity(questionEngine.processTemplate(questionTemplateService.getTemplateByDifficulty("easy")),null,null,null).toString());
+    }
+
+    @Test
+    void testAi(){
+        System.out.println(geminiService.createTemplate((new TemplateCreationRequest("medium_logic_34","תפתיע אותי בנושא מענין!"))));
     }
 
 }

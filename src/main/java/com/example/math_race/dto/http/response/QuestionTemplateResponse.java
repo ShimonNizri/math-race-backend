@@ -1,6 +1,6 @@
 package com.example.math_race.dto.http.response;
 
-import com.example.math_race.entities.templates.QuestionTemplateEntity;
+import com.example.math_race.entities.QuestionTemplateEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

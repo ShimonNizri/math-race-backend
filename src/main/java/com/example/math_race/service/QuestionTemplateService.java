@@ -1,6 +1,6 @@
 package com.example.math_race.service;
 
-import com.example.math_race.entities.templates.QuestionTemplateEntity;
+import com.example.math_race.entities.QuestionTemplateEntity;
 import com.example.math_race.questionGenerator.question.QuestionTemplate;
 import com.example.math_race.repositories.QuestionTemplatesRepository;
 import org.springframework.beans.factory.annotation.Autowired;

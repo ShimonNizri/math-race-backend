@@ -428,7 +428,7 @@
         <property name="deletionDate" type="java.util.Date" column="deletion_date"/>
     </class>
 
-    <class name="com.example.math_race.entities.templates.QuestionTemplateEntity" table="question_templates" lazy="false">
+    <class name="com.example.math_race.entities.QuestionTemplateEntity" table="question_templates" lazy="false">
         <id name="id" type="org.hibernate.type.UUIDBinaryType">
             <column name="id" length="16" />
             <generator class="org.hibernate.id.UUIDGenerator"/>

@@ -1,6 +1,6 @@
 package com.example.math_race.questionGenerator.question;
 
-import com.example.math_race.entities.templates.QuestionTemplateEntity;
+import com.example.math_race.entities.QuestionTemplateEntity;
 
 import java.util.List;
 

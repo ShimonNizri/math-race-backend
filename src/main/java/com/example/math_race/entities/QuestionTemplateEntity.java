@@ -1,6 +1,5 @@
-package com.example.math_race.entities.templates;
+package com.example.math_race.entities;
 
-import com.example.math_race.entities.BaseEntity;
 import com.example.math_race.json.models.questions.QuestionTemplateJsonModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

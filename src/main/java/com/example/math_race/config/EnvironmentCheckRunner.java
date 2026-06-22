@@ -32,7 +32,8 @@ public class EnvironmentCheckRunner implements CommandLineRunner {
                 "DB_ROOT",
                 "DB_SCHEMA",
                 "MAIL_PASSWORD",
-                "MAIL_USERNAME"
+                "MAIL_USERNAME",
+                "GEMINI_API_KEY"
         );
 
         System.out.println(ANSI_CYAN + "=== [System] Environment Variables Initialization Check ===" + ANSI_RESET);

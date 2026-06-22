@@ -3,14 +3,11 @@ package com.example.math_race.service;
 import com.example.math_race.dto.http.request.QuestionReportFilterRequest;
 import com.example.math_race.dto.http.request.QuestionTemplateUpdateRequest;
 import com.example.math_race.dto.http.request.RequestMetadata;
-import com.example.math_race.dto.http.response.AdminTokenResponse;
-import com.example.math_race.dto.http.response.QuestionErrorReportResponse;
-import com.example.math_race.dto.http.response.QuestionTemplateResponse;
-import com.example.math_race.dto.http.response.QuestionTemplateTestResponse;
+import com.example.math_race.dto.http.response.*;
 import com.example.math_race.entities.QuestionErrorReportEntity;
 import com.example.math_race.entities.TokenEntity;
 import com.example.math_race.entities.UserEntity;
-import com.example.math_race.entities.templates.QuestionTemplateEntity;
+import com.example.math_race.entities.QuestionTemplateEntity;
 import com.example.math_race.exception.ErrorCode;
 import com.example.math_race.exception.LogicException;
 import com.example.math_race.questionGenerator.QuestionEngine;
@@ -39,16 +36,18 @@ public class AdminService {
     private final QuestionErrorReportRepository questionErrorReportRepository;
     private final QuestionTemplatesRepository questionRepository;
     private final QuestionTemplateService questionTemplateService;
+    private final GeminiService geminiService;
 
     @Autowired
     public AdminService(AuthService authService, TokenService tokenService, QuestionErrorReportRepository questionErrorReportRepository,
-                        QuestionTemplatesRepository questionRepository, QuestionTemplateService questionTemplateService, QuestionEngine questionEngine) {
+                        QuestionTemplatesRepository questionRepository, QuestionTemplateService questionTemplateService, QuestionEngine questionEngine, GeminiService geminiService) {
         this.authService = authService;
         this.tokenService = tokenService;
         this.questionErrorReportRepository = questionErrorReportRepository;
         this.questionRepository = questionRepository;
         this.questionTemplateService = questionTemplateService;
         this.questionEngine = questionEngine;
+        this.geminiService = geminiService;
     }
 
     @Transactional
@@ -172,5 +171,32 @@ public class AdminService {
 
         TemplateResult<MathQuestion> result = questionEngine.processTemplate(tempTemplate);
         return new QuestionTemplateTestResponse(result);
+    }
+    
+    public TemplateDebugResponse analyzeReportWithAI(String reportId, RequestMetadata metadata){
+        authService.getValidUser(metadata, ADMIN);
+
+        UUID reportUuid;
+        try {
+            reportUuid = UUID.fromString(reportId);
+        } catch (IllegalArgumentException e) {
+            throw new LogicException(ErrorCode.INVALID_INPUT);
+        }
+
+        QuestionErrorReportEntity report = questionErrorReportRepository.loadObject(QuestionErrorReportEntity.class, reportUuid);
+        if (report == null || report.isDeleted()) {
+            throw new LogicException(ErrorCode.REPORT_NOT_FOUND);
+        }
+
+        if (report.getTemplateId() == null || report.getTemplateId().isEmpty()) {
+            throw new LogicException(ErrorCode.INVALID_INPUT);
+        }
+
+        QuestionTemplateEntity template = questionRepository.loadByTemplateId(report.getTemplateId());
+        if (template == null || template.isDeleted()) {
+            throw new LogicException(ErrorCode.TEMPLATE_NOT_FOUND);
+        }
+        
+        return new TemplateDebugResponse(geminiService.debugTemplate(report, template));
     }
 }
